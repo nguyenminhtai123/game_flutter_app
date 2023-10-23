@@ -1,6 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:jankenpon_app/blocs/auth_bloc.dart';
+import 'package:jankenpon_app/main.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -10,8 +12,41 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
+  final AuthBloc bloc = AuthBloc();
+
   bool isChecked = false;
   bool isPlayer = false;
+
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    bloc.dispose();
+    super.dispose();
+  }
+
+  void onPressRegister() {
+    setState(() {
+      if (bloc.isValidInfo(_emailController.text, _phoneController.text,
+          _passwordController.text)) {
+        bloc.signUp(_emailController.text, _phoneController.text,
+            _passwordController.text, () {
+          Navigator.pushNamed(context, '/home');
+        }, (msg) {});
+      }
+    });
+  }
+
+  void onPressLogin() {
+    String email = _emailController.text;
+    String pass = _passwordController.text;
+    var authBloc = MyApp.of(context)?.bloc;
+    authBloc?.logIn(email, pass, () {
+      Navigator.pushNamed(context, '/home');
+    }, (msg) {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,46 +86,70 @@ class _AuthScreenState extends State<AuthScreen> {
                   const SizedBox(
                     height: 32,
                   ),
-                  const TextField(
-                    decoration: InputDecoration(
-                      label: Text('Enter Your Email'),
-                      labelStyle: TextStyle(
-                        color: Color.fromARGB(255, 133, 132, 132),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Color.fromARGB(255, 194, 193, 193),
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Color.fromARGB(255, 194, 193, 193),
-                        ),
-                      ),
-                    ),
-                  ),
+                  StreamBuilder(
+                      stream: bloc.emailController.asBroadcastStream(),
+                      builder: (context, snapshot) {
+                        return TextField(
+                          controller: _emailController,
+                          style: GoogleFonts.barlowSemiCondensed(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 20,
+                          ),
+                          decoration: InputDecoration(
+                              label: const Text('Enter Your Email'),
+                              labelStyle: const TextStyle(
+                                color: Color.fromARGB(255, 133, 132, 132),
+                              ),
+                              enabledBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Color.fromARGB(255, 194, 193, 193),
+                                ),
+                              ),
+                              focusedBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Color.fromARGB(255, 194, 193, 193),
+                                ),
+                              ),
+                              errorText: snapshot.hasError
+                                  ? snapshot.error.toString()
+                                  : null),
+                        );
+                      }),
                   const SizedBox(
                     height: 12,
                   ),
-                  const TextField(
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      label: Text('Please Enter Your Password'),
-                      labelStyle: TextStyle(
-                        color: Color.fromARGB(255, 133, 132, 132),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Color.fromARGB(255, 194, 193, 193),
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Color.fromARGB(255, 194, 193, 193),
-                        ),
-                      ),
-                    ),
-                  ),
+                  StreamBuilder(
+                      stream: bloc.passwordController.asBroadcastStream(),
+                      builder: (context, snapshot) {
+                        return TextField(
+                          controller: _passwordController,
+                          style: GoogleFonts.barlowSemiCondensed(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 20,
+                          ),
+                          obscureText: true,
+                          decoration: InputDecoration(
+                              label: const Text('Please Enter Your Password'),
+                              labelStyle: const TextStyle(
+                                color: Color.fromARGB(255, 133, 132, 132),
+                              ),
+                              enabledBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Color.fromARGB(255, 194, 193, 193),
+                                ),
+                              ),
+                              focusedBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Color.fromARGB(255, 194, 193, 193),
+                                ),
+                              ),
+                              errorText: snapshot.hasError
+                                  ? snapshot.error.toString()
+                                  : null),
+                        );
+                      }),
                   const SizedBox(
                     height: 18,
                   ),
@@ -130,7 +189,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     height: 125,
                   ),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: onPressLogin,
                     child: Container(
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
@@ -211,67 +270,103 @@ class _AuthScreenState extends State<AuthScreen> {
                   const SizedBox(
                     height: 32,
                   ),
-                  const TextField(
-                    decoration: InputDecoration(
-                      label: Text('Enter Your Email'),
-                      labelStyle: TextStyle(
-                        color: Color.fromARGB(255, 133, 132, 132),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Color.fromARGB(255, 194, 193, 193),
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Color.fromARGB(255, 194, 193, 193),
-                        ),
-                      ),
-                    ),
-                  ),
+                  StreamBuilder(
+                      stream: bloc.emailController.asBroadcastStream(),
+                      builder: (context, snapshot) {
+                        return TextField(
+                          controller: _emailController,
+                          style: GoogleFonts.barlowSemiCondensed(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 20,
+                          ),
+                          decoration: InputDecoration(
+                              label: const Text('Enter Your Email'),
+                              labelStyle: const TextStyle(
+                                color: Color.fromARGB(255, 133, 132, 132),
+                              ),
+                              enabledBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Color.fromARGB(255, 194, 193, 193),
+                                ),
+                              ),
+                              focusedBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Color.fromARGB(255, 194, 193, 193),
+                                ),
+                              ),
+                              errorText: snapshot.hasError
+                                  ? snapshot.error.toString()
+                                  : null),
+                        );
+                      }),
                   const SizedBox(
                     height: 12,
                   ),
-                  const TextField(
-                    decoration: InputDecoration(
-                      label: Text('Enter Your Phone Number'),
-                      labelStyle: TextStyle(
-                        color: Color.fromARGB(255, 133, 132, 132),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Color.fromARGB(255, 194, 193, 193),
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Color.fromARGB(255, 194, 193, 193),
-                        ),
-                      ),
-                    ),
-                  ),
+                  StreamBuilder(
+                      stream: bloc.phoneController.asBroadcastStream(),
+                      builder: (context, snapshot) {
+                        return TextField(
+                          controller: _phoneController,
+                          style: GoogleFonts.barlowSemiCondensed(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 20,
+                          ),
+                          decoration: InputDecoration(
+                              label: const Text('Enter Your Phone Number'),
+                              labelStyle: const TextStyle(
+                                color: Color.fromARGB(255, 133, 132, 132),
+                              ),
+                              enabledBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Color.fromARGB(255, 194, 193, 193),
+                                ),
+                              ),
+                              focusedBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Color.fromARGB(255, 194, 193, 193),
+                                ),
+                              ),
+                              errorText: snapshot.hasError
+                                  ? snapshot.error.toString()
+                                  : null),
+                        );
+                      }),
                   const SizedBox(
                     height: 12,
                   ),
-                  const TextField(
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      label: Text('Please Enter Your Password'),
-                      labelStyle: TextStyle(
-                        color: Color.fromARGB(255, 133, 132, 132),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Color.fromARGB(255, 194, 193, 193),
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Color.fromARGB(255, 194, 193, 193),
-                        ),
-                      ),
-                    ),
-                  ),
+                  StreamBuilder(
+                      stream: bloc.passwordController.asBroadcastStream(),
+                      builder: (context, snapshot) {
+                        return TextField(
+                          controller: _passwordController,
+                          style: GoogleFonts.barlowSemiCondensed(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 20,
+                          ),
+                          obscureText: true,
+                          decoration: InputDecoration(
+                              label: const Text('Please Enter Your Password'),
+                              labelStyle: const TextStyle(
+                                color: Color.fromARGB(255, 133, 132, 132),
+                              ),
+                              enabledBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Color.fromARGB(255, 194, 193, 193),
+                                ),
+                              ),
+                              focusedBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Color.fromARGB(255, 194, 193, 193),
+                                ),
+                              ),
+                              errorText: snapshot.hasError
+                                  ? snapshot.error.toString()
+                                  : null),
+                        );
+                      }),
                   const SizedBox(
                     height: 18,
                   ),
@@ -300,7 +395,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     height: 100,
                   ),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: onPressRegister,
                     child: Container(
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
@@ -309,7 +404,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 11),
                       child: Text(
-                        'Login',
+                        'Register',
                         style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w600,

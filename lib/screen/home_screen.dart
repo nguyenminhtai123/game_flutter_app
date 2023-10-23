@@ -116,9 +116,19 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const HSLColor.fromAHSL(1, 239, 0.49, 0.15).toColor(),
+        leading: GestureDetector(
+          onTap: () {},
+          child: const Icon(
+            Icons.menu,
+            color: Colors.white,
+          ),
+        ),
+      ),
       body: Container(
         padding: const EdgeInsets.only(
-          top: 30.0,
+          top: 15.0,
           left: 8.0,
           right: 8.0,
           bottom: 8.0,
