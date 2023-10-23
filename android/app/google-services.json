@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "242702312475",
+    "project_id": "game-app-b3ecc",
+    "storage_bucket": "game-app-b3ecc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:242702312475:android:177579e3c68a1b93a484be",
+        "android_client_info": {
+          "package_name": "com.example.jankenpon_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPV606lfJJXBHMCmfkT0H-W__FUX8IOEI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
