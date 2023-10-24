@@ -15,7 +15,7 @@ class _AuthScreenState extends State<AuthScreen> {
   final AuthBloc bloc = AuthBloc();
 
   bool isChecked = false;
-  bool isPlayer = false;
+  bool isPlayer = true;
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
